@@ -1,0 +1,19 @@
+# Ignore compiled Python files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore dataset and model weights
+mnist.pkl
+weights.pkl
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+
+# Ignore virtual environments (if using one)
+venv/
+.env
+
+app.py
