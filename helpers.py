@@ -2,6 +2,13 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
+import gzip
+
+def clip_gradients(grad, threshold=5.0):
+    norm = np.linalg.norm(grad)  # Compute L2 norm
+    if norm > threshold:
+        grad *= (threshold / norm)  # Scale gradients down instead of hard clipping
+    return grad
 
 
 def MakeOneHot(Y, D_out):
@@ -25,4 +32,3 @@ def load():
     with open("mnist.pkl",'rb') as f:
         mnist = pickle.load(f)
     return mnist["training_images"], mnist["training_labels"], mnist["test_images"], mnist["test_labels"]  
-

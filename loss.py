@@ -31,4 +31,5 @@ class CrossEntropyLoss():
         Y_serial = np.argmax(Y_true, axis=1)
         dout = prob.copy()
         dout[np.arange(N), Y_serial] -= 1
+        dout /= N
         return loss, dout

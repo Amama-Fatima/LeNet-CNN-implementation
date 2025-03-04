@@ -10,11 +10,11 @@ from urllib import request
 class FC():
     def __init__(self, D_in, D_out):
         self.cache = None
-        self.W = {'val': np.random.normal(0.0, np.sqrt(2/D_in), (D_in, D_out)), 'grad': 0}
+        self.W = {'val': np.random.randn(D_in, D_out) * np.sqrt(2./D_in), 'grad': 0}
         self.b = {'val': np.random.randn(D_out), 'grad': 0}
 
     def _forward(self, X):
-        out = np.dot(X, self.W['val'] + self.b['val'])
+        out = np.dot(X, self.W['val']) + self.b['val']  # Corrected line
         self.cache = X
         return out
 
