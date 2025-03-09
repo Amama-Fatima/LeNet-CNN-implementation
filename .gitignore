@@ -17,3 +17,6 @@ venv/
 .env
 
 app.py
+emnist/
+lenet_weights_emnist.pkl
+
