@@ -9,6 +9,7 @@ from leNet_layers import Conv, MaxPool
 from layers import FC, ReLU, Softmax
 from gradient_descent import SGD
 from loss import CrossEntropyLoss
+from emnist_helpers import load_emnist
 from helpers import MakeOneHot, draw_losses, get_batch, load
 
 
@@ -26,7 +27,6 @@ class LeNet(Net):
         self.FC2 = FC(120, 84)
         self.ReLU4 = ReLU()
         self.FC3 = FC(84, 10)
-        self.Softmax = Softmax()
 
         self.p2_shape = None
 
@@ -139,7 +139,7 @@ class LeNet(Net):
 
 
 # Load dataset
-X_train, Y_train, X_test, Y_test = load()
+X_train, Y_train, X_test, Y_test = load_emnist()
 
 # Normalize and center the data
 X_train, X_test = X_train / 255.0, X_test / 255.0
@@ -161,7 +161,7 @@ optim = SGD(model.get_params(), lr=0.001, momentum=0.9, reg=1e-4)
 criterion = CrossEntropyLoss()
 
 # Training loop
-ITER = 25000
+ITER = 20000
 tracemalloc.start()
 np.seterr(over='ignore')  # Prevent overflow warnings
 np.set_printoptions(precision=4, suppress=True)
@@ -179,31 +179,40 @@ for i in range(ITER):
         print(f"Memory: {current/1e6:.2f}MB (Peak: {peak/1e6:.2f}MB)")
         losses.append(loss)
 
-# Save trained model weights
 weights = model.get_params()
-with open("lenet_weights.pkl", "wb") as f:
+with open("lenet_weights_emnist.pkl", "wb") as f:
     pickle.dump(weights, f)
 
 draw_losses(losses)
 
-# Evaluate accuracy on training set
-Y_pred = model.forward(X_train)
-result = np.argmax(Y_pred, axis=1) - Y_train
-print(f"TRAIN--> Correct: {list(result).count(0)} out of {X_train.shape[0]}, acc={list(result).count(0) / X_train.shape[0]:.4f}")
+def evaluate(model, X, Y, batch_size=64):
+    num_samples = X.shape[0]
+    num_batches = num_samples // batch_size
+    correct = 0
 
-# Evaluate accuracy on test set
-Y_pred = model.forward(X_test)
-result = np.argmax(Y_pred, axis=1) - Y_test
-print(f"TEST--> Correct: {list(result).count(0)} out of {X_test.shape[0]}")
+    for i in range(num_batches):
+        start = i * batch_size
+        end = (i + 1) * batch_size
+        X_batch = X[start:end]
+        Y_batch = Y[start:end]
 
-# Test on random samples
-for i in range(5):
-    idx = random.randint(0, X_test.shape[0] - 1)
-    x = X_test[idx]
-    y = Y_test[idx]
-    y_pred = model.forward(x[np.newaxis, ...])  # Add batch dimension
-    print(f"True label: {y}, Predicted label: {np.argmax(y_pred)}")
+        Y_pred = model.forward(X_batch)
+        predicted_labels = np.argmax(Y_pred, axis=1)
+        correct += np.sum(predicted_labels == Y_batch)
 
-    # Display image
-    plt.imshow(x.squeeze(), cmap='gray')
-    plt.show()
+    if num_samples % batch_size != 0:
+        X_batch = X[num_batches * batch_size:]
+        Y_batch = Y[num_batches * batch_size:]
+        Y_pred = model.forward(X_batch)
+        predicted_labels = np.argmax(Y_pred, axis=1)
+        correct += np.sum(predicted_labels == Y_batch)
+
+    accuracy = correct / num_samples
+    return accuracy
+
+train_accuracy = evaluate(model, X_train, Y_train, batch_size=64)
+print(f"TRAIN--> Correct: {train_accuracy * X_train.shape[0]:.0f} out of {X_train.shape[0]}, acc={train_accuracy:.4f}")
+
+test_accuracy = evaluate(model, X_test, Y_test, batch_size=64)
+print(f"TEST--> Correct: {test_accuracy * X_test.shape[0]:.0f} out of {X_test.shape[0]}, acc={test_accuracy:.4f}")
+
