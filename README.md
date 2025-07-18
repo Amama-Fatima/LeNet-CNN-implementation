@@ -5,8 +5,10 @@ A NumPy-based implementation of the LeNet convolutional neural network 1998 rese
 
 ## 📌 Demo
 
-Interact with the trained model in action at:
+Interact with the trained model at:
 [https://lenet-cnn-digit-classification.onrender.com/](https://lenet-cnn-digit-classification.onrender.com/)
+
+https://github.com/user-attachments/assets/4cbab265-41ad-433c-905a-a9ee7c9ea476
 
 ---
 
