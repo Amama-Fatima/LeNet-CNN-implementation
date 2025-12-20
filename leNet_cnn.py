@@ -138,29 +138,24 @@ class LeNet(Net):
 
 
 
-# Load dataset
 X_train, Y_train, X_test, Y_test = load_emnist()
 
-# Normalize and center the data
 X_train, X_test = X_train / 255.0, X_test / 255.0
 X_train -= np.mean(X_train)
 X_test -= np.mean(X_test)
 
-X_train = X_train.reshape(-1, 1, 28, 28)  # (batch_size, channels, height, width)
+X_train = X_train.reshape(-1, 1, 28, 28)
 X_test = X_test.reshape(-1, 1, 28, 28)
 
 batch_size = 64
-D_out = 10  # Number of classes
+D_out = 10 
 
-# Initialize LeNet model
 model = LeNet()
 
-# Loss function and optimizer
 losses = []
 optim = SGD(model.get_params(), lr=0.001, momentum=0.9, reg=1e-4)
 criterion = CrossEntropyLoss()
 
-# Training loop
 ITER = 20000
 tracemalloc.start()
 np.seterr(over='ignore')  # Prevent overflow warnings

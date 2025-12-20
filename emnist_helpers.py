@@ -5,7 +5,6 @@ import pickle
 def save_emnist():
     emnist = {}
     
-    # Load training images with rotation/flip correction
     with open("emnist/emnist-digits-train-images-idx3-ubyte", 'rb') as f:
         train_images = np.frombuffer(f.read(), np.uint8, offset=16)
         train_images = train_images.reshape(-1, 28, 28)
@@ -30,14 +29,12 @@ def save_emnist():
             
         emnist["test_images"] = corrected_test.reshape(-1, 28*28)
     
-    # Load labels (same as before)
     with open("emnist/emnist-digits-train-labels-idx1-ubyte", 'rb') as f:
         emnist["training_labels"] = np.frombuffer(f.read(), np.uint8, offset=8)
     
     with open("emnist/emnist-digits-test-labels-idx1-ubyte", 'rb') as f:
         emnist["test_labels"] = np.frombuffer(f.read(), np.uint8, offset=8)
     
-    # Save to pickle
     with open("emnist_digits.pkl", 'wb') as f:
         pickle.dump(emnist, f)
     print("EMNIST Digits saved!")

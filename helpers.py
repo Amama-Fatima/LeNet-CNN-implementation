@@ -5,9 +5,9 @@ import pickle
 import gzip
 
 def clip_gradients(grad, threshold=5.0):
-    norm = np.linalg.norm(grad)  # Compute L2 norm
+    norm = np.linalg.norm(grad)  
     if norm > threshold:
-        grad *= (threshold / norm)  # Scale gradients down instead of hard clipping
+        grad *= (threshold / norm)  
     return grad
 
 
